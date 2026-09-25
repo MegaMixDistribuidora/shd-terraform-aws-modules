@@ -135,12 +135,13 @@ consome, e entra neste repositório em um minor release.
 
 ## 6. CI e release
 
-- PR para `main`: workflow `ci-terraform-module` do `shd-github-actions-workflows` — `fmt -check`,
+- PR para `dev` e para `main`: workflow `ci-terraform-module` do `shd-github-actions-workflows` — `fmt -check`,
   `validate` de cada módulo e de cada `examples/*`, `tflint`, `checkov` e `terraform test`
   apenas nos módulos alterados
 - Push em `main`: semantic-release gera a tag `vX.Y.Z` e o release a partir de Conventional Commits
   (`feat(lambda): ...` → minor, `fix(...)` → patch, `BREAKING CHANGE` → major)
-- Ruleset: `main` protegida, merge só por PR com CI verde; tags `v*` imutáveis
+- Fluxo `feature/*` → `dev` → `main`, sem commit direto em `dev`/`main` (regra do workspace). Por ser público, o repositório tem rulesets no plano Free: `dev` e `main` exigem PR e CI verde, sem force push nem deleção; tags `v*` imutáveis
+- O release só cria tag e GitHub Release — nenhum commit do bot na `main`
 
 **Ordem de bootstrap:** este repositório e o `shd-github-actions-workflows` dependem um do outro
 (o CI deste chama um workflow de lá). Na primeira versão, o CI deste repositório roda com os passos
