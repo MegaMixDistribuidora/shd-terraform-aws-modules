@@ -1,0 +1,313 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAppServices",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*",
+        "dynamodb:*",
+        "states:*",
+        "apigateway:*",
+        "sqs:*",
+        "events:*",
+        "scheduler:*",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:GetTopicAttributes",
+        "sns:SetTopicAttributes",
+        "sns:ListTagsForResource",
+        "sns:TagResource",
+        "sns:UntagResource",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "sns:GetSubscriptionAttributes",
+        "sns:SetSubscriptionAttributes",
+        "sns:ListSubscriptionsByTopic",
+        "s3:*",
+        "route53:*",
+        "acm:*",
+        "secretsmanager:*",
+        "ssm:*",
+        "logs:*",
+        "cloudwatch:*",
+        "amplify:*",
+        "cloudtrail:*",
+        "budgets:*",
+        "sts:GetCallerIdentity",
+        "ses:Send*",
+        "cognito-idp:Admin*",
+        "cognito-idp:List*",
+        "aoss:APIAccessAll",
+        "xray:Put*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowKMSUsage",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:DescribeKey",
+        "kms:ListKeys",
+        "kms:ListAliases",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowKMSCreateGrantForAWSServices",
+      "Effect": "Allow",
+      "Action": "kms:CreateGrant",
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "kms:GrantIsForAWSResource": "true"
+        }
+      }
+    },
+    {
+      "Sid": "AllowIAMRoleManagementWithBoundary",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:UpdateRole",
+        "iam:UpdateRoleDescription",
+        "iam:DeleteRole"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PermissionsBoundary": "arn:aws:iam::${account_id}:policy/${product}-SharedPolicyBoundary"
+        }
+      }
+    },
+    {
+      "Sid": "AllowCreateServiceLinkedRole",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::*:role/aws-service-role/ops.apigateway.amazonaws.com/*",
+      "Condition": {
+        "StringLike": {
+          "iam:AWSServiceName": "ops.apigateway.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "AllowIAMRoleReadAndManage",
+      "Effect": "Allow",
+      "Action": [
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListRoles",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:CreatePolicy",
+        "iam:DeletePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicies",
+        "iam:ListPolicyVersions",
+        "iam:TagPolicy",
+        "iam:UntagPolicy",
+        "iam:CreateOpenIDConnectProvider",
+        "iam:DeleteOpenIDConnectProvider",
+        "iam:GetOpenIDConnectProvider",
+        "iam:ListOpenIDConnectProviders",
+        "iam:UpdateOpenIDConnectProviderThumbprint",
+        "iam:AddClientIDToOpenIDConnectProvider",
+        "iam:RemoveClientIDFromOpenIDConnectProvider",
+        "iam:TagOpenIDConnectProvider",
+        "iam:UntagOpenIDConnectProvider"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowPassRoleToAWSServices",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "lambda.amazonaws.com",
+            "states.amazonaws.com",
+            "events.amazonaws.com",
+            "scheduler.amazonaws.com",
+            "apigateway.amazonaws.com",
+            "amplify.amazonaws.com",
+            "cloudtrail.amazonaws.com",
+            "dynamodb.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyPrivilegeEscalation",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateUser",
+        "iam:DeleteUser",
+        "iam:UpdateUser",
+        "iam:AttachUserPolicy",
+        "iam:DetachUserPolicy",
+        "iam:PutUserPolicy",
+        "iam:DeleteUserPolicy",
+        "iam:CreateGroup",
+        "iam:DeleteGroup",
+        "iam:UpdateGroup",
+        "iam:AttachGroupPolicy",
+        "iam:DetachGroupPolicy",
+        "iam:AddUserToGroup",
+        "iam:RemoveUserFromGroup",
+        "iam:CreateAccessKey",
+        "iam:UpdateAccessKey",
+        "iam:DeleteAccessKey",
+        "iam:CreateLoginProfile",
+        "iam:UpdateLoginProfile",
+        "iam:DeleteLoginProfile",
+        "iam:*SAMLProvider*",
+        "iam:*MFA*",
+        "iam:*VirtualMFADevice*",
+        "iam:CreateAccountAlias",
+        "iam:DeleteAccountAlias",
+        "iam:DeleteRolePermissionsBoundary"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyKMSKeyManagement",
+      "Effect": "Deny",
+      "Action": [
+        "kms:CreateKey",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion",
+        "kms:DisableKey",
+        "kms:EnableKey",
+        "kms:ImportKeyMaterial",
+        "kms:DeleteImportedKeyMaterial",
+        "kms:PutKeyPolicy",
+        "kms:UpdateKeyDescription",
+        "kms:UpdateAlias",
+        "kms:CreateAlias",
+        "kms:DeleteAlias",
+        "kms:DisableKeyRotation",
+        "kms:EnableKeyRotation",
+        "kms:ReplicateKey",
+        "kms:UpdatePrimaryRegion"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyIdentityCenter",
+      "Effect": "Deny",
+      "Action": [
+        "sso:*",
+        "sso-admin:*",
+        "sso-directory:*",
+        "identitystore:*",
+        "identitystore-auth:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyOrganizationsAndAccount",
+      "Effect": "Deny",
+      "Action": [
+        "organizations:CreateAccount",
+        "organizations:DeleteOrganization",
+        "organizations:MoveAccount",
+        "organizations:RemoveAccountFromOrganization",
+        "organizations:CreateOrganizationalUnit",
+        "organizations:DeleteOrganizationalUnit",
+        "organizations:AttachPolicy",
+        "organizations:DetachPolicy",
+        "organizations:CreatePolicy",
+        "organizations:DeletePolicy",
+        "organizations:EnablePolicyType",
+        "organizations:DisablePolicyType",
+        "account:*",
+        "aws-portal:*",
+        "billing:*",
+        "budgets:ModifyBudget",
+        "budgets:DeleteBudget"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenySecurityObservabilityDisruption",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "guardduty:DeleteDetector",
+        "guardduty:DisassociateFromMasterAccount",
+        "guardduty:DisassociateFromAdministratorAccount",
+        "guardduty:StopMonitoringMembers",
+        "securityhub:DisableSecurityHub",
+        "securityhub:DeleteHub",
+        "config:DeleteConfigurationRecorder",
+        "config:StopConfigurationRecorder",
+        "config:DeleteDeliveryChannel",
+        "config:DeleteConfigRule",
+        "config:DeleteRetentionConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyEC2Infrastructure",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:CreateVpc",
+        "ec2:DeleteVpc",
+        "ec2:CreateSubnet",
+        "ec2:DeleteSubnet"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyBoundarySelfRewrite",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreatePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:DeletePolicy"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:policy/${product}-SharedPolicyBoundary"
+    },
+    {
+      "Sid": "ProtectFoundationState",
+      "Effect": "Deny",
+      "Action": [
+        "s3:DeleteBucket",
+        "s3:DeleteBucketPolicy",
+        "s3:DeleteBucketTagging",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
+        "s3:DeleteObjectTagging",
+        "s3:DeleteObjectVersionTagging"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*terraform-state*",
+        "arn:aws:s3:::*terraform-state*/*"
+      ]
+    }
+  ]
+}
