@@ -1,0 +1,449 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowVPCNetworking",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeVpcs",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeRouteTables",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeNatGateways",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeNetworkAcls",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeTags",
+        "ec2:CreateVpc",
+        "ec2:DeleteVpc",
+        "ec2:ModifyVpcAttribute",
+        "ec2:CreateSubnet",
+        "ec2:DeleteSubnet",
+        "ec2:ModifySubnetAttribute",
+        "ec2:CreateSecurityGroup",
+        "ec2:DeleteSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:CreateRouteTable",
+        "ec2:DeleteRouteTable",
+        "ec2:CreateRoute",
+        "ec2:DeleteRoute",
+        "ec2:AssociateRouteTable",
+        "ec2:DisassociateRouteTable",
+        "ec2:CreateInternetGateway",
+        "ec2:DeleteInternetGateway",
+        "ec2:AttachInternetGateway",
+        "ec2:DetachInternetGateway",
+        "ec2:AllocateAddress",
+        "ec2:ReleaseAddress",
+        "ec2:AssociateAddress",
+        "ec2:DisassociateAddress",
+        "ec2:CreateNatGateway",
+        "ec2:DeleteNatGateway",
+        "ec2:CreateNetworkAcl",
+        "ec2:DeleteNetworkAcl",
+        "ec2:CreateNetworkAclEntry",
+        "ec2:DeleteNetworkAclEntry",
+        "ec2:ReplaceNetworkAclAssociation",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowS3",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:ListAllMyBuckets",
+        "s3:ListBucketVersions",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "s3:DeleteBucketPolicy",
+        "s3:GetBucketPolicyStatus",
+        "s3:GetBucketAcl",
+        "s3:GetBucketCORS",
+        "s3:PutBucketCORS",
+        "s3:DeleteBucketCORS",
+        "s3:GetBucketTagging",
+        "s3:PutBucketTagging",
+        "s3:DeleteBucketTagging",
+        "s3:GetBucketLogging",
+        "s3:PutBucketLogging",
+        "s3:GetBucketNotification",
+        "s3:PutBucketNotification",
+        "s3:GetLifecycleConfiguration",
+        "s3:PutLifecycleConfiguration",
+        "s3:GetEncryptionConfiguration",
+        "s3:PutEncryptionConfiguration",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:GetBucketOwnershipControls",
+        "s3:PutBucketOwnershipControls",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:GetObjectTagging",
+        "s3:PutObjectTagging",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts",
+        "s3:ListBucketMultipartUploads",
+        "s3:GetBucketWebsite",
+        "s3:GetAccelerateConfiguration",
+        "s3:GetBucketObjectLockConfiguration",
+        "s3:GetBucketRequestPayment",
+        "s3:GetReplicationConfiguration",
+        "s3:GetBucketIntelligentTieringConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowInfraServices",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:UpdateTable",
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTables",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:UpdateTimeToLive",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:UpdateContinuousBackups",
+        "dynamodb:CreateBackup",
+        "dynamodb:DeleteBackup",
+        "dynamodb:ListBackups",
+        "dynamodb:TagResource",
+        "dynamodb:UntagResource",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:DescribeLimits",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "ssm:GetParameterHistory",
+        "ssm:PutParameter",
+        "ssm:DeleteParameter",
+        "ssm:DeleteParameters",
+        "ssm:DescribeParameters",
+        "ssm:LabelParameterVersion",
+        "ssm:AddTagsToResource",
+        "ssm:RemoveTagsFromResource",
+        "ssm:ListTagsForResource",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:ListSecrets",
+        "secretsmanager:ListSecretVersionIds",
+        "secretsmanager:RotateSecret",
+        "secretsmanager:CancelRotateSecret",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:PutResourcePolicy",
+        "secretsmanager:DeleteResourcePolicy",
+        "secretsmanager:ValidateResourcePolicy",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource",
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:DescribeLogGroups",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents",
+        "logs:PutSubscriptionFilter",
+        "logs:DeleteSubscriptionFilter",
+        "logs:DescribeSubscriptionFilters",
+        "logs:AssociateKmsKey",
+        "logs:DisassociateKmsKey",
+        "logs:PutResourcePolicy",
+        "logs:DeleteResourcePolicy",
+        "logs:DescribeResourcePolicies"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowEventBusManagement",
+      "Effect": "Allow",
+      "Action": [
+        "events:CreateEventBus",
+        "events:DeleteEventBus",
+        "events:DescribeEventBus",
+        "events:ListEventBuses",
+        "events:PutPermission",
+        "events:RemovePermission",
+        "events:ListTagsForResource",
+        "events:TagResource",
+        "events:UntagResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowKMSUsage",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:DescribeKey",
+        "kms:ListKeys",
+        "kms:ListAliases",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowKMSCreateGrantForAWSServices",
+      "Effect": "Allow",
+      "Action": "kms:CreateGrant",
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "kms:GrantIsForAWSResource": "true"
+        }
+      }
+    },
+    {
+      "Sid": "EnforceBoundaryOnRoleCreation",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PermissionsBoundary": "${boundary_arn}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowPassRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::${account_id}:role/*"
+    },
+    {
+      "Sid": "AllowCreateServiceLinkedRole",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::*:role/aws-service-role/ops.apigateway.amazonaws.com/*",
+      "Condition": {
+        "StringLike": {
+          "iam:AWSServiceName": "ops.apigateway.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "AllowIAMManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:DeleteRole",
+        "iam:UpdateRole",
+        "iam:CreatePolicy",
+        "iam:DeletePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:TagPolicy",
+        "iam:UntagPolicy",
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListRoles",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicies",
+        "iam:PutRolePolicy",
+        "iam:ListPolicyVersions",
+        "iam:ListInstanceProfilesForRole",
+        "iam:UpdateAssumeRolePolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Route53HostedZoneManagement",
+      "Effect": "Allow",
+      "Action": [
+        "route53:DeleteHostedZone",
+        "route53:GetHostedZone",
+        "route53:UpdateHostedZoneComment",
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets",
+        "route53:ListTagsForResource",
+        "route53:ChangeTagsForResource"
+      ],
+      "Resource": "arn:aws:route53:::hostedzone/*"
+    },
+    {
+      "Sid": "Route53GlobalActions",
+      "Effect": "Allow",
+      "Action": [
+        "route53:CreateHostedZone",
+        "route53:ListHostedZones",
+        "route53:ListHostedZonesByName",
+        "route53:GetHostedZoneCount",
+        "route53:GetChange"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowCloudTrailManagement",
+      "Effect": "Allow",
+      "Action": [
+        "cloudtrail:CreateTrail",
+        "cloudtrail:UpdateTrail",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:GetTrail",
+        "cloudtrail:GetTrailStatus",
+        "cloudtrail:StartLogging",
+        "cloudtrail:StopLogging",
+        "cloudtrail:PutEventSelectors",
+        "cloudtrail:GetEventSelectors",
+        "cloudtrail:AddTags",
+        "cloudtrail:RemoveTags"
+      ],
+      "Resource": "arn:aws:cloudtrail:*:${account_id}:trail/*"
+    },
+    {
+      "Sid": "AllowCloudTrailList",
+      "Effect": "Allow",
+      "Action": [
+        "cloudtrail:DescribeTrails",
+        "cloudtrail:ListTrails",
+        "cloudtrail:ListTags",
+        "cloudtrail:GetEventSelectors"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowBudgetsAndOrgRead",
+      "Effect": "Allow",
+      "Action": [
+        "budgets:CreateBudget",
+        "budgets:ModifyBudget",
+        "budgets:DeleteBudget",
+        "budgets:DescribeBudget",
+        "budgets:DescribeBudgets",
+        "budgets:ViewBudget",
+        "sts:GetCallerIdentity",
+        "organizations:DescribeOrganization",
+        "organizations:ListAccounts"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowOIDCProviderManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateOpenIDConnectProvider",
+        "iam:DeleteOpenIDConnectProvider",
+        "iam:GetOpenIDConnectProvider",
+        "iam:ListOpenIDConnectProviders",
+        "iam:UpdateOpenIDConnectProviderThumbprint",
+        "iam:AddClientIDToOpenIDConnectProvider",
+        "iam:RemoveClientIDFromOpenIDConnectProvider",
+        "iam:TagOpenIDConnectProvider",
+        "iam:UntagOpenIDConnectProvider"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:oidc-provider/*"
+    },
+    {
+      "Sid": "AllowAPIGateway",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:GET",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:PATCH",
+        "apigateway:DELETE",
+        "apigateway:TagResource",
+        "apigateway:UntagResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ACMCertificate",
+      "Effect": "Allow",
+      "Action": [
+        "acm:RequestCertificate",
+        "acm:DescribeCertificate",
+        "acm:GetCertificate",
+        "acm:ListCertificates",
+        "acm:DeleteCertificate",
+        "acm:UpdateCertificateOptions",
+        "acm:RenewCertificate",
+        "acm:ImportCertificate",
+        "acm:AddTagsToCertificate",
+        "acm:RemoveTagsFromCertificate",
+        "acm:ListTagsForCertificate"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowCognitoUserPools",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:*"
+      ],
+      "Resource": "arn:aws:cognito-idp:*:${account_id}:userpool/*"
+    },
+    {
+      "Sid": "AllowCognitoAccountLevel",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:CreateUserPool",
+        "cognito-idp:ListUserPools",
+        "cognito-idp:DescribeUserPoolDomain"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowSESIdentitiesAndConfigSets",
+      "Effect": "Allow",
+      "Action": [
+        "ses:*"
+      ],
+      "Resource": [
+        "arn:aws:ses:*:${account_id}:identity/*",
+        "arn:aws:ses:*:${account_id}:configuration-set/*"
+      ]
+    },
+    {
+      "Sid": "AllowSESAccountLevel",
+      "Effect": "Allow",
+      "Action": [
+        "ses:GetAccount",
+        "ses:ListEmailIdentities",
+        "ses:ListConfigurationSets"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
