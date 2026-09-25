@@ -1,11 +1,6 @@
 # shd-terraform-aws-modules — Módulos Terraform compartilhados (Design)
 
-**Data:** 2026-09-25
-**Status:** Aguardando revisão
-**Fase:** 0 (fundação da esteira)
-**Relacionados:** [shd-github-actions-workflows](../../../../shd-github-actions-workflows/docs/superpowers/specs/2026-09-25-shd-github-actions-workflows-design.md) ·
-[delta da fundação](../../../../aws-megamix-infra/docs/superpowers/specs/2026-09-25-megamix-infra-foundation-delta-design.md) ·
-[plataforma](../../../../aws-megamix-infra-platform/docs/superpowers/specs/2026-09-25-megamix-infra-platform-design.md)
+**Estado-alvo** deste repositório. Contexto: [PRD](../../../../docs/prd.md) · [Arquitetura](../../../../docs/arquitetura.md) (ADR-11, ADR-14, ADR-15) · [Fundação](../../../../aws-megamix-infra/docs/superpowers/specs/megamix-infra-foundation-design.md)
 
 ## 1. Objetivo
 
@@ -157,7 +152,7 @@ declarados localmente; ele passa a chamar o workflow compartilhado assim que a `
    - `iam-role`: o plan falha sem `permissions_boundary_arn`
    - `apigw-http-api`: o plan falha com `*` em CORS; cria um authorizer por item do map
 4. Prova de compatibilidade do `github-oidc`: `terraform plan` da fundação em dev, após a troca de
-   `source`, mostra **zero destroy** nos recursos de OIDC (verificado na execução do delta da fundação)
+   `source`, mostra **zero destroy** nos recursos de OIDC (verificado na migração da fundação, §5 da spec dela)
 
 ## 8. Riscos aceitos
 
