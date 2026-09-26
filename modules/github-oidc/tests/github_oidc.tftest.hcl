@@ -94,3 +94,31 @@ run "app_policy_allows_opensearch_serverless" {
     error_message = "A role app precisa gerenciar coleções do OpenSearch Serverless."
   }
 }
+
+run "infra_policy_allows_cognito_email_service_linked_role" {
+  command = apply # mock_provider: nada é criado na AWS
+
+  # Exigido pela AWS quando uma user pool passa a enviar e-mail pelo SES (plataforma, §5.2c).
+  assert {
+    # O `if` filtra antes de avaliar: statements sem Condition nunca são lidos (HCL não faz curto-circuito).
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      contains(flatten([s.Resource]), "arn:aws:iam::*:role/aws-service-role/email.cognito-idp.amazonaws.com/*")
+      && contains(flatten([s.Condition.StringLike["iam:AWSServiceName"]]), "email.cognito-idp.amazonaws.com")
+      if s.Sid == "AllowCreateServiceLinkedRole"
+    ])
+    error_message = "A role infra precisa criar o SLR email.cognito-idp.amazonaws.com para ligar o Cognito ao SES."
+  }
+  assert {
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      contains(flatten([s.Condition.StringLike["iam:AWSServiceName"]]), "ops.apigateway.amazonaws.com")
+      if s.Sid == "AllowCreateServiceLinkedRole"
+    ])
+    error_message = "O SLR do API Gateway continua permitido."
+  }
+  assert {
+    condition     = length(jsonencode(jsondecode(aws_iam_role_policy.infra_deploy_policy.policy))) < 10240
+    error_message = "A policy inline da role infra precisa ter menos de 10240 caracteres."
+  }
+}
