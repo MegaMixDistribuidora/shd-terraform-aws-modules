@@ -44,4 +44,4 @@ Os endereços (`aws_iam_openid_connect_provider.github`, `aws_iam_policy.shared_
 ## Limites
 
 - A boundary é managed policy: **máximo de 6.144 caracteres** sem espaços. Em 2026-09-25 ela renderiza ~5.955 — folga de ~190. O teste `boundary_allows_runtime_needs_and_fits_managed_policy_limit` falha antes de estourar.
-- A policy da role `infra` é inline (máximo 10.240 caracteres por role): ~9.380 em 2026-09-25.
+- A policy da role `infra` é inline (máximo 10.240 caracteres por role): ~9.560 em 2026-09-26 (inclui `logs:*LogDelivery`, exigido pelo access log da API HTTP da plataforma).

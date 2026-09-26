@@ -57,6 +57,19 @@ run "infra_policy_covers_platform_services" {
   }
 }
 
+run "infra_policy_allows_api_gateway_access_logging" {
+  command = apply # mock_provider: nada é criado na AWS
+
+  # Exigido pela AWS para ativar access log de HTTP API (stage da plataforma).
+  assert {
+    condition = alltrue([
+      for a in ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery", "logs:DeleteLogDelivery", "logs:ListLogDeliveries"] :
+      anytrue([for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement : contains(flatten([s.Action]), a)])
+    ])
+    error_message = "A role infra precisa das ações logs:*LogDelivery para a stage da API com access log."
+  }
+}
+
 run "boundary_allows_runtime_needs_and_fits_managed_policy_limit" {
   command = apply # mock_provider: nada é criado na AWS
 
