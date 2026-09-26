@@ -75,6 +75,8 @@ separação do módulo de referência:
   - `cognito-idp:*` sobre user pools da conta
   - `ses:*` de identidade, DKIM e configuration set
   - `apigateway:*` sobre `/apis`, `/domainnames` e `/apimappings` (HTTP API v2)
+  - `iam:CreateServiceLinkedRole` restrito a `ops.apigateway.amazonaws.com` (domínio customizado da API) e
+    `email.cognito-idp.amazonaws.com` (user pools enviando e-mail pelo SES)
   - `budgets:*` (já presente)
 - A role `app` ganha as permissões de que os serviços precisam para criar os próprios recursos:
   Lambda, IAM (roles com a boundary), DynamoDB, SQS, EventBridge (rules no bus), Scheduler,

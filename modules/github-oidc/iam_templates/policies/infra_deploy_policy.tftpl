@@ -250,10 +250,16 @@
       "Sid": "AllowCreateServiceLinkedRole",
       "Effect": "Allow",
       "Action": "iam:CreateServiceLinkedRole",
-      "Resource": "arn:aws:iam::*:role/aws-service-role/ops.apigateway.amazonaws.com/*",
+      "Resource": [
+        "arn:aws:iam::*:role/aws-service-role/ops.apigateway.amazonaws.com/*",
+        "arn:aws:iam::*:role/aws-service-role/email.cognito-idp.amazonaws.com/*"
+      ],
       "Condition": {
         "StringLike": {
-          "iam:AWSServiceName": "ops.apigateway.amazonaws.com"
+          "iam:AWSServiceName": [
+            "ops.apigateway.amazonaws.com",
+            "email.cognito-idp.amazonaws.com"
+          ]
         }
       }
     },
