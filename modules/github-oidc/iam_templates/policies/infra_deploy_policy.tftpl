@@ -444,6 +444,18 @@
         "ses:ListConfigurationSets"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "AllowAPIGatewayAccessLogDelivery",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries"
+      ],
+      "Resource": "*"
     }
   ]
 }
