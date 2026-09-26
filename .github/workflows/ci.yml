@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  pr:
+    uses: MegaMixDistribuidora/shd-github-actions-workflows/.github/workflows/pr-validation.yml@v1.1.0
+
+  modules:
+    needs: pr
+    uses: MegaMixDistribuidora/shd-github-actions-workflows/.github/workflows/ci-terraform-module.yml@v1.1.0

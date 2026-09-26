@@ -138,10 +138,7 @@ consome, e entra neste repositório em um minor release.
 - Fluxo `feature/*` → `dev` → `main`, sem commit direto em `dev`/`main` (regra do workspace). Por ser público, o repositório tem rulesets no plano Free: `dev` e `main` exigem PR e CI verde, sem force push nem deleção; tags `v*` imutáveis
 - O release só cria tag e GitHub Release — nenhum commit do bot na `main`
 
-**Ordem de bootstrap:** este repositório e o `shd-github-actions-workflows` dependem um do outro
-(o CI deste chama um workflow de lá). Na primeira versão, o CI deste repositório roda com os passos
-declarados localmente; ele passa a chamar o workflow compartilhado assim que a `v1.0.0` do
-`shd-github-actions-workflows` existir.
+**CI e release:** `.github/workflows/ci.yml` chama `pr-validation` e `ci-terraform-module`, e `release.yml` chama `release-semantic`, todos do `shd-github-actions-workflows@v1.1.0`. O repositório não mantém `.releaserc.json`.
 
 ## 7. Verificação
 
@@ -160,4 +157,3 @@ declarados localmente; ele passa a chamar o workflow compartilhado assim que a `
 |---|---|
 | Tag única versiona módulos sem relação entre si | Changelog por módulo via escopo do commit; consumidores sobem de versão quando querem |
 | Ampliar a role `infra` aumenta o raio de dano de um workflow comprometido | Trust restrita aos repositórios `aws-megamix-infra*` e ao GitHub Environment; prod exige aprovação manual |
-| Dependência circular com o repositório de workflows no bootstrap | CI local na primeira versão (§6) |
