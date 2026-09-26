@@ -122,3 +122,16 @@ run "infra_policy_allows_cognito_email_service_linked_role" {
     error_message = "A policy inline da role infra precisa ter menos de 10240 caracteres."
   }
 }
+
+run "infra_policy_allows_budget_tagging" {
+  command = apply # mock_provider: nada é criado na AWS
+
+  # O provider AWS lê e grava as tags do aws_budgets_budget (budget da fundação).
+  assert {
+    condition = alltrue([
+      for a in ["budgets:ListTagsForResource", "budgets:TagResource", "budgets:UntagResource"] :
+      anytrue([for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement : contains(flatten([s.Action]), a)])
+    ])
+    error_message = "A role infra precisa das ações de tag do Budgets para gerenciar o budget com tags."
+  }
+}
