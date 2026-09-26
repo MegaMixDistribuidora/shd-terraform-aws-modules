@@ -151,7 +151,7 @@ consome, e entra neste repositório em um minor release.
    - `iam-role`: o plan falha sem `permissions_boundary_arn`
    - `apigw-http-api`: o plan falha com `*` em CORS; cria um authorizer por item do map
 4. Prova de compatibilidade do `github-oidc`: `terraform plan` da fundação em dev, após a troca de
-   `source`, mostra **zero destroy** nos recursos de OIDC (verificado na migração da fundação, §5 da spec dela)
+   `source`, mostra **zero destroy** nos recursos de OIDC
 
 ## 8. Riscos aceitos
 
