@@ -44,4 +44,4 @@ Os endereços (`aws_iam_openid_connect_provider.github`, `aws_iam_policy.shared_
 ## Limites
 
 - A boundary é managed policy: **máximo de 6.144 caracteres** sem espaços. Em 2026-09-25 ela renderiza ~5.955 — folga de ~190. O teste `boundary_allows_runtime_needs_and_fits_managed_policy_limit` falha antes de estourar.
-- A policy da role `infra` é inline (máximo 10.240 caracteres por role). Inclui `logs:*LogDelivery` (access log da API HTTP da plataforma) e `iam:CreateServiceLinkedRole` para `ops.apigateway.amazonaws.com` e `email.cognito-idp.amazonaws.com` (e-mail das user pools pelo SES). O teste `infra_policy_allows_cognito_email_service_linked_role` falha antes de estourar o teto.
+- A policy da role `infra` é inline (máximo 10.240 caracteres por role): ~9.700 em 2026-09-26. Inclui `logs:*LogDelivery` (access log da API HTTP da plataforma) e `iam:CreateServiceLinkedRole` para `ops.apigateway.amazonaws.com` e `email.cognito-idp.amazonaws.com` (e-mail das user pools pelo SES). O teste `infra_policy_allows_cognito_email_service_linked_role` falha antes de estourar o teto.
