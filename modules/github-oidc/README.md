@@ -9,7 +9,7 @@ Provider OIDC do GitHub Actions, as roles de deploy por ambiente e a permission 
 
 `<product>-SharedPolicyBoundary` é o teto de permissões das roles criadas pelos deployers (Lambdas, state machines). A permissão efetiva de cada função vem da policy dela; a boundary só limita.
 
-A role `infra` cria e gerencia chaves KMS gerenciadas pelo cliente só do próprio produto: `kms:CreateKey` exige a tag `Product = <product>` na requisição (e a etiquetagem na criação só vale para chave sem tag `Product`, para não adotar chave de outro produto), a gestão da chave (rotação, key policy, exclusão, tags, aliases) exige a mesma tag na chave, e os aliases ficam restritos a `alias/<product>-*`. A boundary continua negando gestão de chaves às roles criadas pelos deployers.
+A role `infra` cria e gerencia chaves KMS gerenciadas pelo cliente só do próprio produto: `kms:CreateKey` exige a tag `Product = <product>` na requisição (e a etiquetagem na criação só vale para chave sem tag `Product` ou já do próprio produto — `StringEqualsIfExists`, porque no `CreateKey` com tags o KMS pode preencher `aws:ResourceTag` com as tags da requisição —, para não adotar chave de outro produto), a gestão da chave (rotação, key policy, exclusão, tags, aliases) exige a mesma tag na chave, e os aliases ficam restritos a `alias/<product>-*`. A boundary continua negando gestão de chaves às roles criadas pelos deployers.
 
 ## Uso
 
