@@ -185,11 +185,13 @@ run "infra_policy_allows_scoped_kms_key_management" {
   }
   assert {
     # Impede marcar com Product=<product> uma chave já etiquetada por outro produto.
+    # IfExists (e não Null): no CreateKey com tags o KMS pode preencher
+    # aws:ResourceTag com as tags da requisição, e Null negaria a criação.
     condition = anytrue([
       for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
-      try(s.Condition.Null["aws:ResourceTag/Product"], "") == "true"
-      if s.Sid == "AllowKMSKeyCreation"
+      try(s.Condition.StringEqualsIfExists["aws:ResourceTag/Product"], "") == var.product
+      if s.Sid == "AllowKMSKeyCreation" && try(s.Condition.Null, null) == null
     ])
-    error_message = "A criação de chave KMS só pode etiquetar chaves sem a tag Product."
+    error_message = "A criação de chave KMS só pode etiquetar chaves sem tag Product ou do próprio produto."
   }
 }
