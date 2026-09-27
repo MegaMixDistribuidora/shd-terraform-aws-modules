@@ -81,6 +81,14 @@ run "boundary_allows_runtime_needs_and_fits_managed_policy_limit" {
     error_message = "A boundary precisa permitir e-mail, Cognito admin, OpenSearch Serverless e X-Ray."
   }
   assert {
+    # Aplicações criptografam dados pequenos direto na chave (ex.: cursor de paginação).
+    condition = alltrue([
+      for a in ["kms:Encrypt", "kms:Decrypt"] :
+      contains(one([for s in jsondecode(aws_iam_policy.shared_boundary.policy).Statement : s.Action if s.Sid == "AllowKMSUsage"]), a)
+    ])
+    error_message = "A boundary precisa permitir kms:Encrypt e kms:Decrypt às roles das aplicações."
+  }
+  assert {
     condition     = length(jsonencode(jsondecode(aws_iam_policy.shared_boundary.policy))) < 6144
     error_message = "A boundary é managed policy: o documento precisa ter menos de 6144 caracteres."
   }
