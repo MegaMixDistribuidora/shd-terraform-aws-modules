@@ -221,6 +221,9 @@
       "Condition": {
         "StringEquals": {
           "aws:RequestTag/Product": "${product}"
+        },
+        "Null": {
+          "aws:ResourceTag/Product": "true"
         }
       }
     },

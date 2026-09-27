@@ -172,11 +172,24 @@ run "infra_policy_allows_scoped_kms_key_management" {
     error_message = "A gestão de aliases vale só para alias/<product>-*."
   }
   assert {
-    # O `if` filtra antes de avaliar: só statements sem Condition entram.
+    # Qualquer ação kms: fora dos statements de uso/leitura precisa de Condition
+    # ou, no caso do alias, de resource restrito a alias/<product>-*.
     condition = length([
       for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement : s
-      if !can(s.Condition) && length(setintersection(toset(flatten([s.Action])), toset(["kms:CreateKey", "kms:PutKeyPolicy", "kms:*"]))) > 0
+      if !contains(["AllowKMSUsage", "AllowKMSCreateGrantForAWSServices"], s.Sid)
+      && anytrue([for a in flatten([s.Action]) : startswith(a, "kms:")])
+      && !can(s.Condition)
+      && !alltrue([for r in flatten([s.Resource]) : endswith(r, "alias/${var.product}-*")])
     ]) == 0
-    error_message = "Nenhum statement pode conceder kms:CreateKey ou kms:PutKeyPolicy sem condição."
+    error_message = "Nenhum statement pode conceder gestão de KMS sem condição (exceto aliases do produto)."
+  }
+  assert {
+    # Impede marcar com Product=<product> uma chave já etiquetada por outro produto.
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      try(s.Condition.Null["aws:ResourceTag/Product"], "") == "true"
+      if s.Sid == "AllowKMSKeyCreation"
+    ])
+    error_message = "A criação de chave KMS só pode etiquetar chaves sem a tag Product."
   }
 }
