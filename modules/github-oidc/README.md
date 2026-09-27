@@ -9,6 +9,8 @@ Provider OIDC do GitHub Actions, as roles de deploy por ambiente e a permission 
 
 `<product>-SharedPolicyBoundary` é o teto de permissões das roles criadas pelos deployers (Lambdas, state machines). A permissão efetiva de cada função vem da policy dela; a boundary só limita.
 
+A role `infra` cria e gerencia chaves KMS gerenciadas pelo cliente só do próprio produto: `kms:CreateKey` exige a tag `Product = <product>` na requisição (e a etiquetagem na criação só vale para chave sem tag `Product`, para não adotar chave de outro produto), a gestão da chave (rotação, key policy, exclusão, tags, aliases) exige a mesma tag na chave, e os aliases ficam restritos a `alias/<product>-*`. A boundary continua negando gestão de chaves às roles criadas pelos deployers.
+
 ## Uso
 
 ```hcl
@@ -44,4 +46,7 @@ Os endereços (`aws_iam_openid_connect_provider.github`, `aws_iam_policy.shared_
 ## Limites
 
 - A boundary é managed policy: **máximo de 6.144 caracteres** sem espaços. Em 2026-09-25 ela renderiza ~5.955 — folga de ~190. O teste `boundary_allows_runtime_needs_and_fits_managed_policy_limit` falha antes de estourar.
-- A policy da role `infra` é inline (máximo 10.240 caracteres por role): ~9.800 em 2026-09-26. Inclui `logs:*LogDelivery` (access log da API HTTP da plataforma), as ações de tag do Budgets (budget da fundação) e `iam:CreateServiceLinkedRole` para `ops.apigateway.amazonaws.com` e `email.cognito-idp.amazonaws.com` (e-mail das user pools pelo SES). O teste `infra_policy_allows_cognito_email_service_linked_role` falha antes de estourar o teto.
+- A policy da role `infra` é inline (máximo 10.240 caracteres por role): ~10.135 em 2026-09-27, folga de ~100 (as ações de S3 usam curingas equivalentes, como `s3:*BucketCORS`, para caber a gestão de chaves KMS). A próxima expansão deve mover statements para uma managed policy anexada à role, não acrescentar curingas. Inclui `logs:*LogDelivery` (access log da API HTTP da plataforma), as ações de tag do Budgets (budget da fundação) e `iam:CreateServiceLinkedRole` para `ops.apigateway.amazonaws.com` e `email.cognito-idp.amazonaws.com` (e-mail das user pools pelo SES). O teste `infra_policy_allows_cognito_email_service_linked_role` falha antes de estourar o teto.
+- Chave KMS **sem** tag `Product` pode ser adotada pela role `infra` (basta etiquetá-la com o próprio produto); chaves de outro produto não.
+- A role `infra` pode alterar ou remover a tag `Product` das chaves do próprio produto (`kms:UntagResource` sem restrição de `aws:TagKeys`); restringir exigiria um statement a mais, que não cabe no limite da policy inline.
+- `alias/<product>-*` também casa com aliases de um produto cujo nome comece com `<product>-` (ex.: `acme` e `acme-b2c`). Use nomes de produto que não sejam prefixo um do outro.
