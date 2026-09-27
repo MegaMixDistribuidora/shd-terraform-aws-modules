@@ -135,3 +135,48 @@ run "infra_policy_allows_budget_tagging" {
     error_message = "A role infra precisa das ações de tag do Budgets para gerenciar o budget com tags."
   }
 }
+
+run "infra_policy_allows_scoped_kms_key_management" {
+  command = apply # mock_provider: nada é criado na AWS
+
+  # A plataforma cria a chave KMS gerenciada pelo cliente (alias/<product>-default).
+  assert {
+    condition = length([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement : s
+      if contains(["AllowKMSKeyCreation", "AllowKMSKeyManagement", "AllowKMSAliasManagement"], s.Sid)
+    ]) == 3
+    error_message = "A role infra precisa criar e gerenciar chaves KMS e aliases do produto."
+  }
+  assert {
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      contains(flatten([s.Action]), "kms:CreateKey") && s.Condition.StringEquals["aws:RequestTag/Product"] == var.product
+      if s.Sid == "AllowKMSKeyCreation"
+    ])
+    error_message = "kms:CreateKey só com a tag Product do produto na requisição."
+  }
+  assert {
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      contains(flatten([s.Action]), "kms:PutKeyPolicy") && s.Condition.StringEquals["aws:ResourceTag/Product"] == var.product
+      if s.Sid == "AllowKMSKeyManagement"
+    ])
+    error_message = "A gestão de chaves KMS vale só para chaves com a tag Product do produto."
+  }
+  assert {
+    condition = anytrue([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement :
+      alltrue([for r in flatten([s.Resource]) : endswith(r, "alias/${var.product}-*")])
+      if s.Sid == "AllowKMSAliasManagement"
+    ])
+    error_message = "A gestão de aliases vale só para alias/<product>-*."
+  }
+  assert {
+    # O `if` filtra antes de avaliar: só statements sem Condition entram.
+    condition = length([
+      for s in jsondecode(aws_iam_role_policy.infra_deploy_policy.policy).Statement : s
+      if !can(s.Condition) && length(setintersection(toset(flatten([s.Action])), toset(["kms:CreateKey", "kms:PutKeyPolicy", "kms:*"]))) > 0
+    ]) == 0
+    error_message = "Nenhum statement pode conceder kms:CreateKey ou kms:PutKeyPolicy sem condição."
+  }
+}
