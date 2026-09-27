@@ -66,31 +66,21 @@
         "s3:ListBucket",
         "s3:ListAllMyBuckets",
         "s3:ListBucketVersions",
-        "s3:GetBucketVersioning",
-        "s3:PutBucketVersioning",
-        "s3:GetBucketPolicy",
-        "s3:PutBucketPolicy",
-        "s3:DeleteBucketPolicy",
+        "s3:*BucketVersioning",
+        "s3:*BucketPolicy",
         "s3:GetBucketPolicyStatus",
         "s3:GetBucketAcl",
-        "s3:GetBucketCORS",
-        "s3:PutBucketCORS",
-        "s3:DeleteBucketCORS",
-        "s3:GetBucketTagging",
-        "s3:PutBucketTagging",
-        "s3:DeleteBucketTagging",
+        "s3:*BucketCORS",
+        "s3:*BucketTagging",
         "s3:GetBucketLogging",
         "s3:PutBucketLogging",
         "s3:GetBucketNotification",
         "s3:PutBucketNotification",
         "s3:GetLifecycleConfiguration",
         "s3:PutLifecycleConfiguration",
-        "s3:GetEncryptionConfiguration",
-        "s3:PutEncryptionConfiguration",
-        "s3:GetBucketPublicAccessBlock",
-        "s3:PutBucketPublicAccessBlock",
-        "s3:GetBucketOwnershipControls",
-        "s3:PutBucketOwnershipControls",
+        "s3:*EncryptionConfiguration",
+        "s3:*BucketPublicAccessBlock",
+        "s3:*BucketOwnershipControls",
         "s3:GetObject",
         "s3:PutObject",
         "s3:DeleteObject",
@@ -221,6 +211,48 @@
       }
     },
     {
+      "Sid": "AllowKMSKeyCreation",
+      "Effect": "Allow",
+      "Action": [
+        "kms:CreateKey",
+        "kms:TagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Product": "${product}"
+        },
+        "Null": {
+          "aws:ResourceTag/Product": "true"
+        }
+      }
+    },
+    {
+      "Sid": "AllowKMSKeyManagement",
+      "Effect": "Allow",
+      "Action": [
+        "kms:*KeyRotation",
+        "kms:PutKeyPolicy",
+        "kms:UpdateKeyDescription",
+        "kms:*KeyDeletion",
+        "kms:*TagResource",
+        "kms:ListResourceTags",
+        "kms:*Alias"
+      ],
+      "Resource": "arn:aws:kms:*:${account_id}:key/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Product": "${product}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowKMSAliasManagement",
+      "Effect": "Allow",
+      "Action": "kms:*Alias",
+      "Resource": "arn:aws:kms:*:${account_id}:alias/${product}-*"
+    },
+    {
       "Sid": "EnforceBoundaryOnRoleCreation",
       "Effect": "Allow",
       "Action": [
@@ -331,7 +363,6 @@
         "cloudtrail:StartLogging",
         "cloudtrail:StopLogging",
         "cloudtrail:PutEventSelectors",
-        "cloudtrail:GetEventSelectors",
         "cloudtrail:AddTags",
         "cloudtrail:RemoveTags"
       ],
