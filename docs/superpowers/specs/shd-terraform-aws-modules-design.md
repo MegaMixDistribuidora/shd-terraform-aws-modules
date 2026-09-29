@@ -6,10 +6,12 @@
 
 Um único repositório, `MegaMixDistribuidora/shd-terraform-aws-modules`, com os
 módulos Terraform genéricos usados pelos repositórios de infra e de serviço da
-Mega Mix. Substitui o uso de `danhenrique/aws-modules` e
-`SthoreH/shd-terraform-aws-*`, que passam a ser **apenas referência** de código.
+Mega Mix. Substitui o uso de `SthoreH/shd-terraform-aws-*`, que passa a ser
+**apenas referência** de código. Exceção (ADR-11 do workspace): o módulo
+`iam-role` continua em `danhenrique/aws-modules`, consumido fixado por commit,
+até haver motivo para trazê-lo para cá.
 
-Sucesso: a fundação e a plataforma consomem `github-oidc`, `iam-role` e
+Sucesso: a fundação e a plataforma consomem `github-oidc` e
 `apigw-http-api` por tag (`?ref=vX.Y.Z`), sem nenhuma referência a `main` nem a
 repositórios fora da organização.
 
@@ -41,7 +43,6 @@ repositórios fora da organização.
 ```
 modules/
   github-oidc/
-  iam-role/
   apigw-http-api/
 docs/superpowers/specs/
 .github/workflows/      ci.yml (chama ci-terraform-module) · release.yml
@@ -84,16 +85,6 @@ separação do módulo de referência:
   produto), rotas e integrações do API Gateway (sem criar APIs nem domínios), e leitura de SSM
   em `/<product>/*`
 - Outputs: `oidc_provider_arn`, `infra_role_arn`, `app_role_arn`, `boundary_policy_arn`
-
-#### `iam-role`
-
-Role genérica com trust e policies vindas de templates, usada pelas Lambdas e state machines.
-
-- Inputs: `name`, `trust_policy_json`, `inline_policies` (map nome → JSON), `managed_policy_arns`,
-  `permissions_boundary_arn` (obrigatório), `tags`
-- Outputs: `role_arn`, `role_name`
-- Validação: `permissions_boundary_arn` não pode ser vazio — toda role criada por pipeline de app
-  carrega a boundary
 
 #### `apigw-http-api`
 
@@ -148,7 +139,6 @@ consome, e entra neste repositório em um minor release.
 2. `terraform validate` em cada `modules/*` e `examples/*`
 3. `terraform test` em cada módulo — prova, sem conta AWS, que:
    - `github-oidc`: a trust da role `infra` aceita `aws-megamix-infra` e `aws-megamix-infra-platform` e recusa `aws-megamix-app-x`
-   - `iam-role`: o plan falha sem `permissions_boundary_arn`
    - `apigw-http-api`: o plan falha com `*` em CORS; cria um authorizer por item do map
 4. Prova de compatibilidade do `github-oidc`: `terraform plan` da fundação em dev, após a troca de
    `source`, mostra **zero destroy** nos recursos de OIDC
