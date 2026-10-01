@@ -1,5 +1,5 @@
 variable "name" {
-  description = "API name (e.g. megamix-api)."
+  description = "API name (e.g. example-api)."
   type        = string
 }
 
@@ -70,7 +70,7 @@ variable "domain_name" {
 
   validation {
     condition     = (var.domain_name == null) == (var.certificate_arn == null) && (var.domain_name == null) == (var.zone_id == null)
-    error_message = "domain_name, certificate_arn e zone_id devem ser informados juntos ou omitidos."
+    error_message = "domain_name, certificate_arn and zone_id must be set together or omitted."
   }
 }
 

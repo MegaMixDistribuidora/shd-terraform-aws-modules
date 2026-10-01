@@ -112,7 +112,7 @@ Uma API HTTP da plataforma, uma instância por consumidor (as APIs da loja, do p
 | Módulo | Cria | Primeiro consumidor |
 |---|---|---|
 | `lambda` | função + alias + log group com retenção; suporte a layers e arm64 | catalog service |
-| `apigw-http-routes` | rotas + integração Lambda (payload 2.0) + `lambda:InvokeFunction` na API compartilhada, com authorizer por rota | catalog service |
+| `apigw-http-routes` | rotas + integração Lambda (payload 2.0) + `lambda:InvokeFunction` na API escolhida, com authorizer por rota | catalog service |
 | `dynamodb` | tabela on-demand, PITR, SSE, TTL, streams e GSIs opcionais | catalog service |
 | `sqs` | fila + DLQ + redrive + alarme de mensagens na DLQ | catalog service |
 | `eventbridge-rule` | rule no bus + target SQS/Lambda + permissões | orders service |
@@ -145,6 +145,8 @@ consome, e entra neste repositório em um minor release.
      `cors_configuration`
 4. Prova de compatibilidade do `github-oidc`: `terraform plan` da fundação em dev, após a troca de
    `source`, mostra **zero destroy** nos recursos de OIDC
+5. Prova de compatibilidade do `apigw-http-api`: após a plataforma passar para a v1.5.0, `terraform plan` de
+   `aws-megamix-infra-platform` em dev mostra **0 to destroy** nas APIs da loja e do admin (prova dos blocos `moved`)
 
 ## 8. Riscos aceitos
 

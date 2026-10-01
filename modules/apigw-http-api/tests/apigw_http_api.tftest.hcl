@@ -2,25 +2,25 @@ mock_provider "aws" {
   # O mock gera strings aleatórias; o provider valida o formato do ARN usado no access log.
   mock_resource "aws_cloudwatch_log_group" {
     defaults = {
-      arn = "arn:aws:logs:sa-east-1:123456789012:log-group:/aws/apigateway/megamix-api"
+      arn = "arn:aws:logs:sa-east-1:123456789012:log-group:/aws/apigateway/example-api"
     }
   }
 }
 
 variables {
-  name        = "megamix-api"
-  product     = "megamix"
+  name        = "example-api"
+  product     = "example"
   environment = "dev"
-  tags        = { Repository = "github.com/MegaMixDistribuidora/aws-megamix-infra-platform" }
+  tags        = { Repository = "github.com/example/infra" }
 
-  cors_allowed_origins = ["https://dev.danhenrique.com.br", "http://localhost:3000"]
+  cors_allowed_origins = ["https://dev.example.com", "http://localhost:3000"]
 
   jwt_authorizers = {
     customers = { issuer = "https://cognito-idp.sa-east-1.amazonaws.com/sa-east-1_AAAAAAAAA", audience = ["client-loja"] }
     staff     = { issuer = "https://cognito-idp.sa-east-1.amazonaws.com/sa-east-1_BBBBBBBBB", audience = ["client-painel"] }
   }
 
-  domain_name     = "api.dev.danhenrique.com.br"
+  domain_name     = "api.dev.example.com"
   certificate_arn = "arn:aws:acm:sa-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000"
   zone_id         = "Z0123456789ABCDEFGHIJ"
 }
@@ -45,7 +45,7 @@ run "creates_http_api_with_default_stage" {
     error_message = "Retenção padrão do access log deve ser 30 dias."
   }
   assert {
-    condition     = aws_apigatewayv2_api.this.tags["Repository"] == "github.com/MegaMixDistribuidora/aws-megamix-infra-platform" && aws_apigatewayv2_api.this.tags["ManagedBy"] == "terraform"
+    condition     = aws_apigatewayv2_api.this.tags["Repository"] == "github.com/example/infra" && aws_apigatewayv2_api.this.tags["ManagedBy"] == "terraform"
     error_message = "As tags recebidas devem ser mescladas às do módulo."
   }
 }
@@ -79,11 +79,11 @@ run "custom_domain_mapped_to_default_stage" {
     error_message = "O domínio deve mapear para a stage $default."
   }
   assert {
-    condition     = aws_route53_record.alias[0].name == "api.dev.danhenrique.com.br" && aws_route53_record.alias[0].type == "A"
+    condition     = aws_route53_record.alias[0].name == "api.dev.example.com" && aws_route53_record.alias[0].type == "A"
     error_message = "Alias A no Route53 com o nome do domínio."
   }
   assert {
-    condition     = output.domain_name == "api.dev.danhenrique.com.br"
+    condition     = output.domain_name == "api.dev.example.com"
     error_message = "Output domain_name deve devolver o domínio."
   }
 }
@@ -105,7 +105,7 @@ run "rejects_wildcard_origin_among_others" {
   command = plan
 
   variables {
-    cors_allowed_origins = ["https://dev.danhenrique.com.br", "*"]
+    cors_allowed_origins = ["https://dev.example.com", "*"]
   }
 
   expect_failures = [var.cors_allowed_origins]
