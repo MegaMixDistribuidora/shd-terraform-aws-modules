@@ -91,3 +91,18 @@ resource "aws_route53_record" "alias" {
     evaluate_target_health = false
   }
 }
+
+moved {
+  from = aws_apigatewayv2_domain_name.this
+  to   = aws_apigatewayv2_domain_name.this[0]
+}
+
+moved {
+  from = aws_apigatewayv2_api_mapping.this
+  to   = aws_apigatewayv2_api_mapping.this[0]
+}
+
+moved {
+  from = aws_route53_record.alias
+  to   = aws_route53_record.alias[0]
+}
