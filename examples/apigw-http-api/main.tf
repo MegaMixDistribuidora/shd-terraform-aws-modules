@@ -22,3 +22,14 @@ module "api" {
 
   tags = { ManagedBy = "terraform" }
 }
+
+# API interna (serviço a serviço): sem domínio, CORS nem authorizers.
+module "internal_api" {
+  source = "../../modules/apigw-http-api"
+
+  name        = "example-internal-api"
+  product     = "example"
+  environment = "dev"
+
+  tags = { ManagedBy = "terraform" }
+}

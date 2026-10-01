@@ -88,30 +88,31 @@ separação do módulo de referência:
 
 #### `apigw-http-api`
 
-A API HTTP compartilhada da plataforma. Usado **uma vez**, pela plataforma.
+Uma API HTTP da plataforma, uma instância por consumidor (as APIs da loja, do portal e a interna entre serviços).
 
 - Cria: `aws_apigatewayv2_api` (HTTP), stage `$default` com `auto_deploy = true`, access log em
   CloudWatch (retenção configurável, padrão 30 dias, formato JSON sem corpo de requisição),
-  throttling padrão da stage, CORS, JWT authorizers a partir de um map, domínio customizado com
-  certificado ACM regional, `api_mapping` do domínio para a stage `$default` e registro alias no
-  Route53
+  throttling padrão da stage, CORS (só com `cors_allowed_origins` não vazio), JWT authorizers a partir
+  de um map (pode ser vazio), e, só com `domain_name` informado, domínio customizado com certificado
+  ACM regional, `api_mapping` do domínio para a stage `$default` e registro alias no Route53
 - Inputs:
   - `name`, `product`, `environment`, `tags`
-  - `cors_allowed_origins` (list, sem `*`), `cors_allowed_headers`, `cors_allowed_methods`
+  - `cors_allowed_origins` (list, sem `*`, padrão vazio = sem CORS), `cors_allowed_headers`, `cors_allowed_methods`
   - `throttling_burst_limit` (padrão 200), `throttling_rate_limit` (padrão 100 req/s)
-  - `jwt_authorizers` — map `nome → { issuer, audience }`
-  - `domain_name`, `certificate_arn`, `zone_id`
+  - `jwt_authorizers` — map `nome → { issuer, audience }`, padrão vazio
+  - `domain_name`, `certificate_arn`, `zone_id` — padrão `null`; os três juntos ou nenhum
   - `access_log_retention_days` (padrão 30)
 - Outputs: `api_id`, `api_endpoint`, `execution_arn`, `stage_name`, `authorizer_ids` (map),
-  `domain_name`
-- Validação: `cors_allowed_origins` não aceita `*`; `jwt_authorizers` exige ao menos um item
+  `domain_name` (`null` sem domínio)
+- Validação: `cors_allowed_origins` não aceita `*`; `domain_name`, `certificate_arn` e `zone_id`
+  informados juntos ou nenhum
 
 ### 5.2 Fases seguintes (contrato planejado, fora do escopo desta spec)
 
 | Módulo | Cria | Primeiro consumidor |
 |---|---|---|
 | `lambda` | função + alias + log group com retenção; suporte a layers e arm64 | catalog service |
-| `apigw-http-routes` | rotas + integração Lambda (payload 2.0) + `lambda:InvokeFunction` na API compartilhada, com authorizer por rota | catalog service |
+| `apigw-http-routes` | rotas + integração Lambda (payload 2.0) + `lambda:InvokeFunction` na API escolhida, com authorizer por rota | catalog service |
 | `dynamodb` | tabela on-demand, PITR, SSE, TTL, streams e GSIs opcionais | catalog service |
 | `sqs` | fila + DLQ + redrive + alarme de mensagens na DLQ | catalog service |
 | `eventbridge-rule` | rule no bus + target SQS/Lambda + permissões | orders service |
@@ -139,9 +140,13 @@ consome, e entra neste repositório em um minor release.
 2. `terraform validate` em cada `modules/*` e `examples/*`
 3. `terraform test` em cada módulo — prova, sem conta AWS, que:
    - `github-oidc`: a trust da role `infra` aceita `aws-megamix-infra` e `aws-megamix-infra-platform` e recusa `aws-megamix-app-x`
-   - `apigw-http-api`: o plan falha com `*` em CORS; cria um authorizer por item do map
+   - `apigw-http-api`: o plan falha com `*` em CORS e com domínio sem certificado; cria um authorizer
+     por item do map; sem domínio, sem CORS e sem authorizer não cria domínio, mapping, registro nem
+     `cors_configuration`
 4. Prova de compatibilidade do `github-oidc`: `terraform plan` da fundação em dev, após a troca de
    `source`, mostra **zero destroy** nos recursos de OIDC
+5. Prova de compatibilidade do `apigw-http-api`: após a plataforma passar para a v1.5.0, `terraform plan` de
+   `aws-megamix-infra-platform` em dev mostra **0 to destroy** nas APIs da loja e do admin (prova dos blocos `moved`)
 
 ## 8. Riscos aceitos
 
