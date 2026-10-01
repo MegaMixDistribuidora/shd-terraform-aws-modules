@@ -1,5 +1,5 @@
 variable "name" {
-  description = "API name (e.g. megamix-api)."
+  description = "API name (e.g. example-api)."
   type        = string
 }
 
@@ -20,12 +20,13 @@ variable "tags" {
 }
 
 variable "cors_allowed_origins" {
-  description = "Allowed CORS origins. Wildcard is not allowed."
+  description = "Allowed CORS origins. Empty (default) disables CORS. Wildcard is not allowed."
   type        = list(string)
+  default     = []
 
   validation {
-    condition     = length(var.cors_allowed_origins) > 0 && alltrue([for o in var.cors_allowed_origins : o != "*"])
-    error_message = "cors_allowed_origins must list explicit origins and cannot contain \"*\"."
+    condition     = alltrue([for o in var.cors_allowed_origins : o != "*"])
+    error_message = "cors_allowed_origins cannot contain \"*\"."
   }
 }
 
@@ -54,31 +55,35 @@ variable "throttling_rate_limit" {
 }
 
 variable "jwt_authorizers" {
-  description = "JWT authorizers keyed by name (e.g. customers, staff)."
+  description = "JWT authorizers keyed by name (e.g. customers, staff). Empty (default) creates none."
   type = map(object({
     issuer   = string
     audience = list(string)
   }))
-
-  validation {
-    condition     = length(var.jwt_authorizers) > 0
-    error_message = "jwt_authorizers must contain at least one authorizer."
-  }
+  default = {}
 }
 
 variable "domain_name" {
-  description = "Custom domain for the API (e.g. api.example.com)."
+  description = "Custom domain for the API (e.g. api.example.com). Null (default) creates no domain, mapping or alias."
   type        = string
+  default     = null
+
+  validation {
+    condition     = (var.domain_name == null) == (var.certificate_arn == null) && (var.domain_name == null) == (var.zone_id == null)
+    error_message = "domain_name, certificate_arn and zone_id must be set together or omitted."
+  }
 }
 
 variable "certificate_arn" {
-  description = "Regional ACM certificate ARN covering domain_name."
+  description = "Regional ACM certificate ARN covering domain_name. Required with domain_name."
   type        = string
+  default     = null
 }
 
 variable "zone_id" {
-  description = "Route53 hosted zone id where the alias record is created."
+  description = "Route53 hosted zone id where the alias record is created. Required with domain_name."
   type        = string
+  default     = null
 }
 
 variable "access_log_retention_days" {

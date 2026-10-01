@@ -3,11 +3,15 @@ resource "aws_apigatewayv2_api" "this" {
   protocol_type = "HTTP"
   description   = "Shared HTTP API - ${var.product} ${var.environment}"
 
-  cors_configuration {
-    allow_origins = var.cors_allowed_origins
-    allow_methods = var.cors_allowed_methods
-    allow_headers = var.cors_allowed_headers
-    max_age       = 3600
+  dynamic "cors_configuration" {
+    for_each = length(var.cors_allowed_origins) > 0 ? [1] : []
+
+    content {
+      allow_origins = var.cors_allowed_origins
+      allow_methods = var.cors_allowed_methods
+      allow_headers = var.cors_allowed_headers
+      max_age       = 3600
+    }
   }
 
   tags = local.tags
@@ -53,6 +57,8 @@ resource "aws_apigatewayv2_authorizer" "jwt" {
 }
 
 resource "aws_apigatewayv2_domain_name" "this" {
+  count = var.domain_name == null ? 0 : 1
+
   domain_name = var.domain_name
 
   domain_name_configuration {
@@ -65,19 +71,38 @@ resource "aws_apigatewayv2_domain_name" "this" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "this" {
+  count = var.domain_name == null ? 0 : 1
+
   api_id      = aws_apigatewayv2_api.this.id
-  domain_name = aws_apigatewayv2_domain_name.this.id
+  domain_name = aws_apigatewayv2_domain_name.this[0].id
   stage       = aws_apigatewayv2_stage.default.id
 }
 
 resource "aws_route53_record" "alias" {
+  count = var.domain_name == null ? 0 : 1
+
   zone_id = var.zone_id
   name    = var.domain_name
   type    = "A"
 
   alias {
-    name                   = aws_apigatewayv2_domain_name.this.domain_name_configuration[0].target_domain_name
-    zone_id                = aws_apigatewayv2_domain_name.this.domain_name_configuration[0].hosted_zone_id
+    name                   = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].target_domain_name
+    zone_id                = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+moved {
+  from = aws_apigatewayv2_domain_name.this
+  to   = aws_apigatewayv2_domain_name.this[0]
+}
+
+moved {
+  from = aws_apigatewayv2_api_mapping.this
+  to   = aws_apigatewayv2_api_mapping.this[0]
+}
+
+moved {
+  from = aws_route53_record.alias
+  to   = aws_route53_record.alias[0]
 }
