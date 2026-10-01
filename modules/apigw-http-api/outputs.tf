@@ -24,6 +24,6 @@ output "authorizer_ids" {
 }
 
 output "domain_name" {
-  description = "Custom domain of the API."
-  value       = aws_apigatewayv2_domain_name.this.domain_name
+  description = "Custom domain of the API, or null when none was configured."
+  value       = one(aws_apigatewayv2_domain_name.this[*].domain_name)
 }

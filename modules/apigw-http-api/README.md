@@ -25,6 +25,21 @@ module "api" {
 }
 ```
 
+### API interna (serviço a serviço)
+
+Sem domínio, CORS nem authorizers: a API fica só com o endpoint `execute-api`.
+
+```hcl
+module "internal_api" {
+  source = "git::https://github.com/MegaMixDistribuidora/shd-terraform-aws-modules.git//modules/apigw-http-api?ref=vX.Y.Z"
+
+  name        = "example-internal-api"
+  product     = "example"
+  environment = var.environment
+  tags        = local.tags
+}
+```
+
 ## Inputs
 
 | Nome | Tipo | Padrão | Descrição |
@@ -32,14 +47,14 @@ module "api" {
 | `name` | string | — | nome da API |
 | `product` · `environment` | string | — | usados na descrição e nas tags |
 | `tags` | map(string) | `{}` | mescladas às tags do módulo |
-| `cors_allowed_origins` | list(string) | — | origens explícitas; `*` é recusado |
+| `cors_allowed_origins` | list(string) | `[]` | origens explícitas; vazio desliga o CORS; `*` é recusado |
 | `cors_allowed_headers` | list(string) | `["authorization", "content-type"]` | |
 | `cors_allowed_methods` | list(string) | GET, POST, PUT, PATCH, DELETE, OPTIONS | |
 | `throttling_burst_limit` · `throttling_rate_limit` | number | 200 · 100 | padrão da stage |
-| `jwt_authorizers` | map(object({ issuer, audience })) | — | ao menos um |
-| `domain_name` · `certificate_arn` · `zone_id` | string | — | domínio, certificado regional e zona |
+| `jwt_authorizers` | map(object({ issuer, audience })) | `{}` | vazio não cria authorizer |
+| `domain_name` · `certificate_arn` · `zone_id` | string | `null` | domínio, certificado regional e zona; informados juntos ou omitidos (sem eles, não há domínio, mapping nem alias) |
 | `access_log_retention_days` | number | 30 | retenção do access log |
 
 ## Outputs
 
-`api_id`, `api_endpoint`, `execution_arn`, `stage_name`, `authorizer_ids` (nome → id), `domain_name`.
+`api_id`, `api_endpoint`, `execution_arn`, `stage_name`, `authorizer_ids` (nome → id), `domain_name` (`null` sem domínio).

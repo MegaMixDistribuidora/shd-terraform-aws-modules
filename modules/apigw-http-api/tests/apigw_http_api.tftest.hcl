@@ -71,15 +71,15 @@ run "custom_domain_mapped_to_default_stage" {
   command = apply # mock_provider
 
   assert {
-    condition     = aws_apigatewayv2_domain_name.this.domain_name_configuration[0].endpoint_type == "REGIONAL" && aws_apigatewayv2_domain_name.this.domain_name_configuration[0].security_policy == "TLS_1_2"
+    condition     = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].endpoint_type == "REGIONAL" && aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].security_policy == "TLS_1_2"
     error_message = "Domínio deve ser regional com TLS 1.2."
   }
   assert {
-    condition     = aws_apigatewayv2_api_mapping.this.stage == aws_apigatewayv2_stage.default.id
+    condition     = aws_apigatewayv2_api_mapping.this[0].stage == aws_apigatewayv2_stage.default.id
     error_message = "O domínio deve mapear para a stage $default."
   }
   assert {
-    condition     = aws_route53_record.alias.name == "api.dev.danhenrique.com.br" && aws_route53_record.alias.type == "A"
+    condition     = aws_route53_record.alias[0].name == "api.dev.danhenrique.com.br" && aws_route53_record.alias[0].type == "A"
     error_message = "Alias A no Route53 com o nome do domínio."
   }
   assert {
@@ -111,22 +111,37 @@ run "rejects_wildcard_origin_among_others" {
   expect_failures = [var.cors_allowed_origins]
 }
 
-run "rejects_empty_origin_list" {
-  command = plan
-
+run "internal_api_without_domain_cors_or_authorizers" {
+  command = apply
   variables {
     cors_allowed_origins = []
+    jwt_authorizers      = {}
+    domain_name          = null
+    certificate_arn      = null
+    zone_id              = null
   }
-
-  expect_failures = [var.cors_allowed_origins]
+  assert {
+    condition     = length(aws_apigatewayv2_domain_name.this) == 0 && length(aws_apigatewayv2_api_mapping.this) == 0 && length(aws_route53_record.alias) == 0
+    error_message = "Sem domínio, o módulo não cria domínio, mapping nem alias."
+  }
+  assert {
+    condition     = length(aws_apigatewayv2_api.this.cors_configuration) == 0
+    error_message = "Sem origens, a API não tem CORS."
+  }
+  assert {
+    condition     = output.authorizer_ids == {} && output.domain_name == null
+    error_message = "Sem authorizer e sem domínio, os outputs ficam vazios."
+  }
 }
 
-run "rejects_empty_authorizers" {
+run "rejects_domain_without_certificate" {
   command = plan
+  variables { certificate_arn = null }
+  expect_failures = [var.domain_name]
+}
 
-  variables {
-    jwt_authorizers = {}
-  }
-
-  expect_failures = [var.jwt_authorizers]
+run "rejects_domain_without_zone" {
+  command = plan
+  variables { zone_id = null }
+  expect_failures = [var.domain_name]
 }
