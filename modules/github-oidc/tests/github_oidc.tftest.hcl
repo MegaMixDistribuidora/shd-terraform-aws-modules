@@ -81,6 +81,11 @@ run "boundary_allows_runtime_needs_and_fits_managed_policy_limit" {
     error_message = "A boundary precisa permitir e-mail, Cognito admin, OpenSearch Serverless e X-Ray."
   }
   assert {
+    # Serviços chamam a API interna (AWS_IAM) com SigV4; sem isso a role recebe 403 mesmo com a policy certa.
+    condition     = contains(one([for s in jsondecode(aws_iam_policy.shared_boundary.policy).Statement : s.Action if s.Sid == "AllowAppServices"]), "execute-api:Invoke")
+    error_message = "A boundary precisa permitir execute-api:Invoke às roles das aplicações (API interna)."
+  }
+  assert {
     # Aplicações criptografam dados pequenos direto na chave (ex.: cursor de paginação).
     condition = alltrue([
       for a in ["kms:Encrypt", "kms:Decrypt"] :
